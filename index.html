@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LendOptima AI - Loan Approval Analytics & Prediction</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- PapaParse for CSV parsing & Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Model parameters and Application logic -->
+    <script src="model_params.js" defer></script>
+    <script src="app.js" defer></script>
+    
+    <!-- MathJax for rendering LaTeX equations -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand-container">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>LendOptima <span class="accent-text">AI</span></h1>
+                    <p>Approval Classifier</p>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="overview">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Overview Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="calculator">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Eligibility Predictor</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="explorer">
+                    <i class="fa-solid fa-table"></i>
+                    <span>Data Explorer</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="model-info">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>Model Insights</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" id="btn-about-project" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>About Project</span>
+                </button>
+                
+                <div class="model-badge" style="margin-top: 15px;">
+                    <i class="fa-solid fa-circle-check text-success"></i>
+                    <div>
+                        <p class="badge-title">Logistic Regression</p>
+                        <p class="badge-subtitle">Accuracy: 88.0%</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h2 id="current-tab-title">Overview Dashboard</h2>
+                    <p id="current-tab-subtitle">Real-time statistics & visual analytics of the loan approval dataset</p>
+                </div>
+                
+                <div class="header-actions">
+                    <!-- CSV Upload Dropzone Indicator / Action -->
+                    <div id="data-status-badge" class="status-indicator loading">
+                        <span class="status-dot"></span>
+                        <span id="data-status-text">Loading dataset...</span>
+                    </div>
+                    
+                    <button class="btn btn-secondary btn-icon" id="btn-theme-toggle" title="Toggle Light/Dark Mode">
+                        <i class="fa-solid fa-sun" id="theme-toggle-icon"></i>
+                    </button>
+                    
+                    <button class="btn btn-secondary btn-icon" id="btn-sync-data" title="Re-sync with loan_approval_data.csv">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                    
+                    <label class="btn btn-primary" id="btn-upload-label" for="csv-file-input" style="display:none;">
+                        <i class="fa-solid fa-file-upload"></i>
+                        <span>Upload CSV</span>
+                    </label>
+                    <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
+                </div>
+            </header>
+
+            <!-- Page Sections -->
+            <div class="content-body">
+                
+                <!-- Section 1: Overview Dashboard -->
+                <section id="tab-overview" class="tab-content active">
+                    <!-- KPI Scorecards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card purple-gradient">
+                            <div class="kpi-icon"><i class="fa-solid fa-folder-open"></i></div>
+                            <div class="kpi-content">
+                                <h3>Total Applications</h3>
+                                <div class="value" id="kpi-total">1,000</div>
+                                <div class="subtitle"><i class="fa-solid fa-database"></i> Source: loan_approval_data.csv</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card green-gradient">
+                            <div class="kpi-icon"><i class="fa-solid fa-award"></i></div>
+                            <div class="kpi-content">
+                                <h3>Approval Rate</h3>
+                                <div class="value" id="kpi-rate">29.8%</div>
+                                <div class="subtitle" id="kpi-rate-sub"><i class="fa-solid fa-check-circle"></i> 298 Approved applications</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card blue-gradient">
+                            <div class="kpi-icon"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="kpi-content">
+                                <h3>Avg Applicant Income</h3>
+                                <div class="value" id="kpi-income">$10,853</div>
+                                <div class="subtitle"><i class="fa-solid fa-chart-line"></i> Monthly average income</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card gold-gradient">
+                            <div class="kpi-icon"><i class="fa-solid fa-credit-card"></i></div>
+                            <div class="kpi-content">
+                                <h3>Avg Credit Score</h3>
+                                <div class="value" id="kpi-credit">676</div>
+                                <div class="subtitle" id="kpi-credit-sub"><i class="fa-solid fa-arrow-up-right-dots"></i> Prime eligibility threshold</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <h4>Credit Score Bracket vs Approval Rate</h4>
+                                <span class="chart-desc">Higher credit scores correlate heavily with loan approvals</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-credit-score"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h4>Overall Approval Split</h4>
+                                <span class="chart-desc">Ratio of approved vs rejected applications</span>
+                            </div>
+                            <div class="chart-container pie-container">
+                                <canvas id="chart-approval-pie"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h4>Loan Purpose Breakdown</h4>
+                                <span class="chart-desc">Distribution of loans by category</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-purpose"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <h4>Debt-To-Income (DTI) Ratio vs Approval Probability</h4>
+                                <span class="chart-desc">Probability of approval dropping off as DTI increases</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-dti-curve"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Section 2: Eligibility Calculator -->
+                <section id="tab-calculator" class="tab-content">
+                    <div class="calculator-layout">
+                        <!-- Input Parameters Form -->
+                        <div class="form-container card-panel">
+                            <div class="panel-header">
+                                <h3>Applicant Profile Input</h3>
+                                <p>Adjust slider inputs and options to run the Logistic Regression model in real time.</p>
+                            </div>
+                            
+                            <form id="predictor-form">
+                                <div class="form-section-title">Financial Details</div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-applicant-income">
+                                            <span>Applicant Monthly Income ($)</span>
+                                            <input type="number" id="num-applicant-income" min="1000" max="30000" value="10850">
+                                        </label>
+                                        <input type="range" id="input-applicant-income" min="1000" max="30000" step="100" value="10850" class="slider">
+                                        <div class="slider-labels"><span>$1k</span><span>$15k</span><span>$30k</span></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="input-coapplicant-income">
+                                            <span>Coapplicant Income ($)</span>
+                                            <input type="number" id="num-coapplicant-income" min="0" max="15000" value="5000">
+                                        </label>
+                                        <input type="range" id="input-coapplicant-income" min="0" max="15000" step="100" value="5000" class="slider">
+                                        <div class="slider-labels"><span>$0</span><span>$7.5k</span><span>$15k</span></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-credit-score">
+                                            <span>Credit Score</span>
+                                            <input type="number" id="num-credit-score" min="300" max="850" value="676">
+                                        </label>
+                                        <input type="range" id="input-credit-score" min="300" max="850" step="1" value="676" class="slider">
+                                        <div class="slider-labels"><span>300 (Poor)</span><span>675 (Good)</span><span>850 (Excellent)</span></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="input-dti-ratio">
+                                            <span>Debt-to-Income (DTI) Ratio</span>
+                                            <input type="number" id="num-dti-ratio" min="0.0" max="1.0" step="0.01" value="0.35">
+                                        </label>
+                                        <input type="range" id="input-dti-ratio" min="0.0" max="1.0" step="0.01" value="0.35" class="slider">
+                                        <div class="slider-labels"><span>0.0 (Zero Debt)</span><span>0.5</span><span>1.0 (High Debt)</span></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-savings">
+                                            <span>Savings Balance ($)</span>
+                                            <input type="number" id="num-savings" min="0" max="50000" value="9900">
+                                        </label>
+                                        <input type="range" id="input-savings" min="0" max="50000" step="250" value="9900" class="slider">
+                                        <div class="slider-labels"><span>$0</span><span>$25k</span><span>$50k</span></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="input-collateral-value">
+                                            <span>Collateral Value ($)</span>
+                                            <input type="number" id="num-collateral-value" min="0" max="100000" value="25000">
+                                        </label>
+                                        <input type="range" id="input-collateral-value" min="0" max="100000" step="500" value="25000" class="slider">
+                                        <div class="slider-labels"><span>$0</span><span>$50k</span><span>$100k</span></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-loan-amount">
+                                            <span>Requested Loan Amount ($)</span>
+                                            <input type="number" id="num-loan-amount" min="1000" max="50000" value="20000">
+                                        </label>
+                                        <input type="range" id="input-loan-amount" min="1000" max="50000" step="250" value="20000" class="slider">
+                                        <div class="slider-labels"><span>$1k</span><span>$25k</span><span>$50k</span></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="select-loan-term">Loan Term</label>
+                                        <select id="select-loan-term" class="custom-select">
+                                            <option value="12">12 Months</option>
+                                            <option value="24">24 Months</option>
+                                            <option value="36">36 Months</option>
+                                            <option value="48" selected>48 Months</option>
+                                            <option value="60">60 Months</option>
+                                            <option value="72">72 Months</option>
+                                            <option value="84">84 Months</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-section-title">Demographics & Background</div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-age">
+                                            <span>Age</span>
+                                            <input type="number" id="num-age" min="18" max="75" value="40">
+                                        </label>
+                                        <input type="range" id="input-age" min="18" max="75" step="1" value="40" class="slider">
+                                        <div class="slider-labels"><span>18 Years</span><span>45</span><span>75 Years</span></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="input-dependents">
+                                            <span>Number of Dependents</span>
+                                            <input type="number" id="num-dependents" min="0" max="5" value="1">
+                                        </label>
+                                        <input type="range" id="input-dependents" min="0" max="5" step="1" value="1" class="slider">
+                                        <div class="slider-labels"><span>0</span><span>2</span><span>5+</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="select-employment-status">Employment Status</label>
+                                        <select id="select-employment-status" class="custom-select">
+                                            <option value="Salaried" selected>Salaried Employee</option>
+                                            <option value="Self-employed">Self Employed</option>
+                                            <option value="Contract">Contractual</option>
+                                            <option value="Unemployed">Unemployed</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="select-employer-category">Employer Category</label>
+                                        <select id="select-employer-category" class="custom-select">
+                                            <option value="Private" selected>Private Sector</option>
+                                            <option value="Government">Government / Public</option>
+                                            <option value="MNC">Multinational Corp (MNC)</option>
+                                            <option value="Business">Local Business owner</option>
+                                            <option value="Unemployed">None / Unemployed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="select-education-level">Education Level</label>
+                                        <select id="select-education-level" class="custom-select">
+                                            <option value="Graduate" selected>Graduate Degree</option>
+                                            <option value="Not Graduate">Undergraduate / High School</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="select-marital-status">Marital Status</label>
+                                        <select id="select-marital-status" class="custom-select">
+                                            <option value="Married" selected>Married</option>
+                                            <option value="Single">Single / Divorced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="select-loan-purpose">Loan Purpose</label>
+                                        <select id="select-loan-purpose" class="custom-select">
+                                            <option value="Business" selected>Business Ventures</option>
+                                            <option value="Car">Car / Auto Purchase</option>
+                                            <option value="Education">Education / Tuition</option>
+                                            <option value="Home">Home Purchase / Renovation</option>
+                                            <option value="Personal">Personal Expense</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="select-property-area">Property Area</label>
+                                        <select id="select-property-area" class="custom-select">
+                                            <option value="Urban" selected>Urban Area</option>
+                                            <option value="Semiurban">Semiurban Area</option>
+                                            <option value="Rural">Rural Area</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="select-gender">Gender</label>
+                                        <select id="select-gender" class="custom-select">
+                                            <option value="Male" selected>Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="input-existing-loans">
+                                            <span>Existing Loans count</span>
+                                            <input type="number" id="num-existing-loans" min="0" max="5" value="1">
+                                        </label>
+                                        <input type="range" id="input-existing-loans" min="0" max="5" step="1" value="1" class="slider">
+                                        <div class="slider-labels"><span>0</span><span>2</span><span>5</span></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Prediction Output / Result Display -->
+                        <div class="results-container">
+                            <div class="result-card card-panel">
+                                <div class="panel-header text-center">
+                                    <h3>Approval Verdict</h3>
+                                    <p>Logistic Regression Estimate</p>
+                                </div>
+                                
+                                <div class="gauge-section">
+                                    <!-- Radial Gauge -->
+                                    <div class="gauge-wrapper">
+                                        <svg class="gauge-svg" viewBox="0 0 100 100">
+                                            <!-- Background circle track -->
+                                            <path class="gauge-track" d="M 20 80 A 40 40 0 1 1 80 80" fill="none" stroke-width="8" />
+                                            <!-- Active probability path -->
+                                            <path id="gauge-fill" class="gauge-fill approved" d="M 20 80 A 40 40 0 1 1 80 80" fill="none" stroke-width="8" stroke-dasharray="188.5" stroke-dashoffset="188.5" />
+                                        </svg>
+                                        <div class="gauge-text-container">
+                                            <span id="txt-probability-percentage" class="probability-val text-success">0.0%</span>
+                                        </div>
+                                    </div>
+                                    <div class="probability-lbl">Approval Probability</div>
+                                </div>
+                                
+                                <div id="decision-badge" class="badge-card approved">
+                                    <div class="badge-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <div class="badge-details">
+                                        <h4 id="decision-status">ELIGIBLE / APPROVED</h4>
+                                        <p id="decision-desc">This profile meets standard underwriting rules and passes the risk threshold.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="factors-section">
+                                    <h4>Primary Decision Drivers</h4>
+                                    <p class="section-desc">Features contributing to the model's positive or negative log-odds prediction.</p>
+                                    
+                                    <ul class="factor-list" id="list-decision-factors">
+                                        <!-- Dynamically generated elements will go here -->
+                                        <li>
+                                            <div class="factor-icon success"><i class="fa-solid fa-plus"></i></div>
+                                            <div class="factor-text"><strong>Credit Score:</strong> 720 provides strong positive classification weight (+1.25)</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Section 3: Data Explorer -->
+                <section id="tab-explorer" class="tab-content">
+                    <div class="card-panel">
+                        <!-- Table Filter Controls -->
+                        <div class="explorer-toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="table-search" placeholder="Search applicant ID, income...">
+                            </div>
+                            
+                            <div class="toolbar-filters">
+                                <select id="filter-purpose" class="custom-select filter-select">
+                                    <option value="">All Loan Purposes</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Car">Car</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Personal">Personal</option>
+                                </select>
+                                
+                                <select id="filter-employment" class="custom-select filter-select">
+                                    <option value="">All Employment</option>
+                                    <option value="Salaried">Salaried</option>
+                                    <option value="Self-employed">Self-employed</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Unemployed">Unemployed</option>
+                                </select>
+                                
+                                <select id="filter-approved" class="custom-select filter-select">
+                                    <option value="">All Approval Status</option>
+                                    <option value="Yes">Approved</option>
+                                    <option value="No">Rejected</option>
+                                </select>
+                                
+                                <button class="btn btn-secondary" id="btn-clear-filters">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Main Data Table -->
+                        <div class="table-scroll-container">
+                            <table class="data-table" id="dataset-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Age</th>
+                                        <th>Gender</th>
+                                        <th>Income ($)</th>
+                                        <th>Credit Score</th>
+                                        <th>DTI Ratio</th>
+                                        <th>Collateral ($)</th>
+                                        <th>Loan Amount ($)</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted py-5">
+                                            <i class="fa-solid fa-spinner fa-spin fa-2x mb-3"></i>
+                                            <p>Parsing dataset...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Table Footer / Pagination -->
+                        <div class="table-footer">
+                            <div class="pagination-info" id="pagination-text">
+                                Showing 1-10 of 1,000 records
+                            </div>
+                            <div class="pagination-controls">
+                                <button class="btn btn-secondary btn-icon" id="btn-prev-page" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                                <div class="page-numbers" id="page-numbers-container">
+                                    <span class="page-num active">1</span>
+                                    <span class="page-num">2</span>
+                                    <span class="page-num">3</span>
+                                </div>
+                                <button class="btn btn-secondary btn-icon" id="btn-next-page"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Section 4: Model Insights -->
+                <section id="tab-model-info" class="tab-content">
+                    <div class="insights-layout">
+                        <!-- Left Side: Metrics Card -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3>Model Performance & Overview</h3>
+                                <p>Logistic Regression trained with standard scaling and feature transformations.</p>
+                            </div>
+                            
+                            <div class="metric-highlights">
+                                <div class="metric-box">
+                                    <span class="metric-value">88.0%</span>
+                                    <span class="metric-label">Accuracy</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-value">78.5%</span>
+                                    <span class="metric-label">Precision</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-value">83.6%</span>
+                                    <span class="metric-label">Recall</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-value">81.0%</span>
+                                    <span class="metric-label">F1-Score</span>
+                                </div>
+                            </div>
+                            
+                            <div class="insights-body text-block">
+                                <h4>Model Mathematical Blueprint</h4>
+                                <p>
+                                    The model operates on 28 standardized features including engineered interaction parameters:
+                                </p>
+                                <div class="formula-box">
+                                    $$ \text{LogOdds}(z) = \beta_0 + \sum_{i=1}^{28} \beta_i \left( \frac{X_i - \mu_i}{\sigma_i} \right) $$
+                                    $$ P(\text{Approved}) = \frac{1}{1 + e^{-z}} $$
+                                </div>
+                                <p>
+                                    To fit the non-linear thresholds of loan approvals, two critical feature engineering transformations are applied:
+                                </p>
+                                <ul>
+                                    <li><strong>Credit Score Squared ($Credit\_Score^2$):</strong> Dramatically accelerates the approval probability as credit ratings cross key tiers (e.g. from subprime to prime).</li>
+                                    <li><strong>DTI Ratio Squared ($DTI\_Ratio^2$):</strong> Imposes an exponential penalty for borrowers as debt exceeds comfortable margins.</li>
+                                    <li><strong>Log Income ($\ln(Income + 1)$):</strong> Compresses wide income distributions to represent diminishing returns on extreme wealth.</li>
+                                </ul>
+                                <button id="btn-compare-models" class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                                    <i class="fa-solid fa-code-compare"></i>
+                                    <span>Compare with Other Models</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side: Confusion Matrix & Feature Importances -->
+                        <div class="insights-visuals">
+                            <!-- Confusion Matrix -->
+                            <div class="card-panel">
+                                <div class="panel-header">
+                                    <h3>Confusion Matrix</h3>
+                                    <p>Evaluation results on the 200-sample test set</p>
+                                </div>
+                                
+                                <div class="confusion-matrix-container">
+                                    <div class="cm-grid">
+                                        <!-- Header labels -->
+                                        <div></div>
+                                        <div></div>
+                                        <div class="cm-header text-center font-semibold text-danger">Predicted Rejected</div>
+                                        <div class="cm-header text-center font-semibold text-success">Predicted Approved</div>
+                                        
+                                        <!-- Row 1: Actual Rejected -->
+                                        <div class="cm-axis-label font-semibold" style="grid-row: span 2;">ACTUAL</div>
+                                        <div class="cm-row-title font-semibold text-danger">REJECTED</div>
+                                        <div class="cm-cell true-negative">
+                                            <span class="cm-value">125</span>
+                                            <span class="cm-cell-label">True Negative</span>
+                                        </div>
+                                        <div class="cm-cell false-positive">
+                                            <span class="cm-value">14</span>
+                                            <span class="cm-cell-label">False Positive</span>
+                                        </div>
+                                        
+                                        <!-- Row 2: Actual Approved -->
+                                        <div class="cm-row-title font-semibold text-success">APPROVED</div>
+                                        <div class="cm-cell false-negative">
+                                            <span class="cm-value">10</span>
+                                            <span class="cm-cell-label">False Negative</span>
+                                        </div>
+                                        <div class="cm-cell true-positive">
+                                            <span class="cm-value">51</span>
+                                            <span class="cm-cell-label">True Positive</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="cm-analysis">
+                                    <p><i class="fa-solid fa-circle-info text-info"></i> <strong>Key Insight:</strong> Out of 61 actual approved loans, the model successfully identified 51 (83.6% Recall). The false positive rate is low (14 out of 139), meaning a small risk of approving default-prone applicants.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Feature weights -->
+                            <div class="card-panel">
+                                <div class="panel-header">
+                                    <h3>Feature Importance Weights</h3>
+                                    <p>Standardized coefficients (positive values favor approval, negative values favor rejection)</p>
+                                </div>
+                                <div class="chart-container large">
+                                    <canvas id="chart-feature-importance"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Model Comparison Modal -->
+    <div id="modal-model-comparison" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-chart-line text-primary"></i> Model Comparison Dashboard</h3>
+                <button class="btn-close" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">
+                    We compared three different classification models during the training phase in the Jupyter notebook. Here is a performance overview of each model on the 20% validation test set.
+                </p>
+                
+                <div class="modal-chart-container">
+                    <canvas id="chart-model-comparison"></canvas>
+                </div>
+                
+                <div class="modal-table-container">
+                    <table class="data-table comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Classifier Model</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlighted-row">
+                                <td><strong>Logistic Regression (Selected)</strong></td>
+                                <td>88.0%</td>
+                                <td>78.5%</td>
+                                <td>83.6%</td>
+                                <td>81.0%</td>
+                                <td><span class="status-pill approved">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Gaussian Naive Bayes</td>
+                                <td>86.0%</td>
+                                <td>81.1%</td>
+                                <td>70.5%</td>
+                                <td>75.4%</td>
+                                <td><span class="status-pill warning">Backup</span></td>
+                            </tr>
+                            <tr>
+                                <td>K-Nearest Neighbors (KNN)</td>
+                                <td>78.5%</td>
+                                <td>67.3%</td>
+                                <td>57.4%</td>
+                                <td>61.9%</td>
+                                <td><span class="status-pill rejected">Rejected</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="comparison-analysis text-block" style="margin-top: 20px;">
+                    <h4>Architectural Rationale</h4>
+                    <p>
+                        <strong>Logistic Regression</strong> was chosen for deployment because it shows the highest <strong>Recall (83.6%)</strong> and <strong>F1-Score (81.0%)</strong>. In credit lending, missing out on eligible borrowers (false negatives) is expensive, so higher recall with solid precision is preferred. 
+                    </p>
+                    <p>
+                        <strong>KNN</strong> suffers due to the high dimensionality (28 features after one-hot encoding) causing distance metrics to collapse (curse of dimensionality). <strong>Naive Bayes</strong> performs well but assumes independence of features, which is strongly violated by standard one-hot encoded variables.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Project Modal -->
+    <div id="modal-about-project" class="modal-overlay">
+        <div class="modal-box" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-circle-info text-primary"></i> About LendOptima AI</h3>
+                <button class="btn-close" id="btn-close-about"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body text-block">
+                <p>
+                    <strong>LendOptima AI</strong> is an interactive machine learning classification dashboard designed to analyze and predict loan eligibility in real time.
+                </p>
+                <p style="margin-top: 14px;">
+                    It utilizes a client-side <strong>Logistic Regression model</strong> (achieving 88.0% accuracy, 83.6% recall, and 81.0% F1-score) trained on applicant metrics. The model integrates key financial features along with engineered interaction metrics—such as $Credit\_Score^2$ and $DTI\_Ratio^2$—to evaluate credit worthiness dynamically.
+                </p>
+                <p style="margin-top: 14px;">
+                    Adjust applicant financial attributes in the <strong>Eligibility Predictor</strong> to run predictions in real-time and explore model feature weights directly.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

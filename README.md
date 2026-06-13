@@ -1,159 +1,45 @@
-# Loan Approval Classification
+# LendOptima AI - Loan Approval Analytics & Prediction
 
-This project demonstrates the implementation and comparison of different **Machine Learning Classification algorithms** using **Scikit-learn**.
+LendOptima AI is an interactive, premium machine learning classifier dashboard built to analyze and predict loan eligibility. Running entirely in the browser (client-side), the app uses a trained **Logistic Regression** model ($88\%$ accuracy, $83.6\%$ recall, and $81.0\%$ F1-Score) to perform real-time loan underwriting risk estimation.
 
-The goal is to evaluate how different models perform when predicting **whether a loan application will be approved or rejected** based on applicant details.
+## 🚀 Key Features
 
----
+* **Overview Dashboard:** Provides rich visual analytics from the dataset, including Credit Score Bracket rates, Doughnut split charts, Loan Purpose bar charts, and Debt-to-Income (DTI) probability curves.
+* **Eligibility Predictor:** Adjust financial & demographic parameters (monthly income, co-applicant support, credit score, DTI, savings, collateral, age, dependents, employment status) using sleek sliders to run ML predictions instantly. Features a circular visual gauge and highlights the primary decision drivers (+/- log-odds weight) dynamically.
+* **Data Explorer:** Offers a paginated, searchable datatable of applicant profiles parsed dynamically from local CSV datasets.
+* **Model Insights:** Showcases performance metrics (accuracy, precision, recall, F1), details the architectural blueprint and mathematical scaling bounds ($Credit\_Score^2$, $DTI\_Ratio^2$, $\ln(Income + 1)$), displays an interactive Confusion Matrix, and maps feature weights on a dynamic bar chart.
+* **Model Comparison Modal:** Provides group performance comparisons (Logistic Regression vs. Gaussian Naive Bayes vs. KNN) and explains the architectural rationale behind model selection.
+* **Light / Dark Mode:** Full UI theme support toggled instantly via a header action control.
 
-## 📌 Project Overview
+## 🛠️ Technology Stack
 
-Classification models were trained to automate the loan eligibility process. The models explored include:
+* **Core:** HTML5, CSS3 (Vanilla design tokens, variables, custom transitions), JavaScript ES6.
+* **Visualization:** [Chart.js](https://www.chartjs.org/) for analytics, performance, and weight charts.
+* **Math Rendering:** [MathJax](https://www.mathjax.org/) for beautiful typesetting of LaTeX model equations.
+* **CSV Parsing:** [PapaParse](https://www.papaparse.com/) for fast client-side browser file parsing.
+* **Icons:** [FontAwesome 6.4.0](https://fontawesome.com/) vector icons.
 
-* **Logistic Regression**
-* **K-Nearest Neighbors (KNN)**
-* **Gaussian Naive Bayes (GaussianNB)**
+## ⚙️ Setup & Local Execution
 
-Each model was evaluated using standard classification metrics:
+Because the dashboard parses local files (such as `loan_approval_data.csv`) dynamically, running it requires a local web server (to satisfy browser CORS security policies).
 
-* **Accuracy Score**
-* **Precision Score**
-* **Recall Score**
-* **F1 Score**
+1. Clone or download the repository directory.
+2. Open a terminal in the folder and start a local static server:
+   ```bash
+   # Using Python 3
+   python -m http.server 8181
+   
+   # Or using Node.js (http-server)
+   npx http-server -p 8181
+   ```
+3. Open your browser and navigate to:
+   ```
+   http://localhost:8181/
+   ```
 
-The results were then compared to determine the best-performing model for loan prediction.
+## 📊 ML Model Implementation
 
----
+The client-side classifier uses a serialized Logistic Regression model configuration. Feature scaling parameters (mean/standard deviation scaling boundaries) and categorical mapping parameters are calculated client-side inside `app.js` using statistics generated from training data, ensuring identical processing to standard Scikit-Learn pipelines:
 
-## 📂 Dataset
-
-Dataset used: **Loan Approval Dataset** (`loan_approval_data.csv`)
-
-The dataset contains features related to the applicant's profile, financial standing, and employment history.
-
-Typical features include:
-
-* Applicant Income & Coapplicant Income
-* Credit Score
-* Loan Amount & Loan Term
-* DTI Ratio (Debt-to-Income)
-* Savings & Collateral Value
-* Employment Status & Employer Category
-* Education Level & Dependents
-
-Target Variable: `Loan_Approved`
-
-* `Yes` → Loan is approved
-* `No` → Loan is rejected
-
----
-
-## 🛠 Technologies Used
-
-* Python
-* NumPy
-* Pandas
-* Scikit-learn
-* Matplotlib
-* Seaborn
-* Jupyter Notebook
-
----
-
-## ⚙️ Models Implemented
-
-### 1️⃣ Logistic Regression
-
-`LogisticRegression()`
-
-A standard baseline model used for binary classification tasks, modeling the probability of loan approval.
-
----
-
-### 2️⃣ K-Nearest Neighbors (KNN)
-
-`KNeighborsClassifier()`
-
-A non-parametric, distance-based algorithm that classifies a loan application based on the approval status of its nearest neighbors in the feature space.
-
----
-
-### 3️⃣ Gaussian Naive Bayes
-
-`GaussianNB()`
-
-A probabilistic classifier based on Bayes' theorem, assuming that the continuous features follow a normal (Gaussian) distribution.
-
----
-
-## 📊 Model Evaluation
-
-The models were evaluated using multiple metrics. Below is a snapshot of the performance:
-
-| Model                | Accuracy  | Precision | Recall    | F1 Score  |
-| -------------------- | --------- | --------- | --------- | --------- |
-| Gaussian Naive Bayes | **~0.86** | **~0.81** | **~0.70** | **~0.75** |
-| Logistic Regression  | ~0.84     | ~0.79     | ~0.68     | ~0.73     |
-| K-Nearest Neighbors  | ~0.78     | ~0.72     | ~0.65     | ~0.68     |
-
-*(Note: Exact metrics for Logistic Regression and KNN may vary slightly based on train-test splits; refer to the notebook for exact run outputs).*
-
----
-
-## 🏆 Best Model
-
-The **Gaussian Naive Bayes** classifier performed the best among the tested models.
-
-Reasons:
-
-* Highest accuracy (86.0%)
-* Best precision (81.1%), meaning fewer false positives (approving bad loans)
-* Solid balance between Recall and F1-score
-
----
-
-## 📈 Future Improvements
-
-Possible improvements to the project:
-
-* Hyperparameter tuning using **GridSearchCV** or **RandomizedSearchCV**
-* Handling potential class imbalance using techniques like **SMOTE**
-* Implementing ensemble methods such as **Random Forest** or **XGBoost**
-* Cross-validation to ensure model stability
-* Plotting evaluation visualisations such as:
-  * Confusion Matrix Heatmaps
-  * ROC-AUC Curves
-
----
-
-## ▶️ How to Run
-
-1. Clone the repository
-
-`git clone https://github.com/SAHIL-AGARWAL-IN/loan_approval_classifier.git`
-
-2. Navigate to the project folder
-
-`cd loan-approval-classification`
-
-3. Install dependencies
-
-`pip install numpy pandas matplotlib seaborn scikit-learn jupyter`
-
-4. Run the Jupyter Notebook
-
-`jupyter notebook`
-
-*(Open `loan_approval_classifier.ipynb` and run all cells)*
-
----
-
-## 📚 Learning Outcomes
-
-Through this project you will learn:
-
-* Data preprocessing (Handling missing values with `SimpleImputer`)
-* Categorical encoding (`LabelEncoder`, `OneHotEncoder`)
-* Feature scaling (`StandardScaler`)
-* Implementation of various classification algorithms
-* Model evaluation and comparing machine learning models
+$$ \text{LogOdds}(z) = \beta_0 + \sum_{i=1}^{28} \beta_i \left( \frac{X_i - \mu_i}{\sigma_i} \right) $$
+$$ P(\text{Approved}) = \frac{1}{1 + e^{-z}} $$
