@@ -1,8 +1,8 @@
 # LendOptima AI - Loan Approval Analytics & Prediction
 
-[![Deployed to Netlify](https://img.shields.io/badge/Deployed%20to-Netlify-00AD9F?style=for-the-badge&logo=netlify&logoColor=white)](https://lendoptimaai.netlify.app/)
+[![Deployed to Vercel](https://img.shields.io/badge/Deployed%20to-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://lend-optima-ai.vercel.app/)
 &nbsp;
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-LendOptima%20AI-6366f1?style=for-the-badge&logo=google-chrome&logoColor=white)](https://lendoptimaai.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-LendOptima%20AI-6366f1?style=for-the-badge&logo=google-chrome&logoColor=white)](https://lend-optima-ai.vercel.app/)
 
 
 LendOptima AI is an interactive, premium machine learning classifier dashboard built to analyze and predict loan eligibility. Running entirely in the browser (client-side), the app uses a trained **Logistic Regression** model ($88\%$ accuracy, $83.6\%$ recall, and $81.0\%$ F1-Score) to perform real-time loan underwriting risk estimation.
