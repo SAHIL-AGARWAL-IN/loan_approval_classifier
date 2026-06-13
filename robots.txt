@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /assets/
+Disallow: /export_model.py
+
+Sitemap: https://lend-optima-ai.vercel.app/sitemap.xml
