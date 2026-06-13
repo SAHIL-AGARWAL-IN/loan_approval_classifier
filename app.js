@@ -1193,3 +1193,17 @@ function updateChartColors(isLight) {
         initModelComparisonChart();
     }
 }
+
+// 17. Register Service Worker for PWA (Progressive Web App) Installability & Offline Cache
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => {
+                console.log('LendOptima AI Service Worker registered successfully with scope:', reg.scope);
+            })
+            .catch(err => {
+                console.error('LendOptima AI Service Worker registration failed:', err);
+            });
+    });
+}
+
