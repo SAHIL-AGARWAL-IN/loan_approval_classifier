@@ -76,7 +76,7 @@ function initTabNavigation() {
     });
 }
 
-// 1.1 Mobile Navigation Handler
+// 1.1 Navigation Sidebar Handler (Mobile Collapsible / Desktop Collapsible)
 function initMobileNavigation() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('sidebar-overlay');
@@ -84,36 +84,58 @@ function initMobileNavigation() {
     const closeBtn = document.getElementById('btn-sidebar-close');
     const navItems = document.querySelectorAll('.nav-item');
 
-    function openSidebar() {
-        if (sidebar && overlay) {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
+    function toggleSidebar() {
+        if (!sidebar) return;
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            sidebar.classList.toggle('open');
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+        } else {
+            sidebar.classList.toggle('collapsed');
+            // Save desktop collapsed state to persist across page loads
+            localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
         }
     }
 
     function closeSidebar() {
-        if (sidebar && overlay) {
+        if (!sidebar) return;
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
             sidebar.classList.remove('open');
-            overlay.classList.remove('active');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
         }
     }
 
     if (openBtn) {
-        openBtn.addEventListener('click', openSidebar);
+        openBtn.addEventListener('click', toggleSidebar);
     }
 
     if (closeBtn) {
-        closeBtn.addEventListener('click', closeSidebar);
+        closeBtn.addEventListener('click', toggleSidebar);
     }
 
     if (overlay) {
         overlay.addEventListener('click', closeSidebar);
     }
 
-    // Close sidebar when a navigation item is clicked (on mobile)
+    // Close sidebar on item click (mobile only)
     navItems.forEach(item => {
-        item.addEventListener('click', closeSidebar);
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
     });
+
+    // Restore desktop collapsed state on page load
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed && window.innerWidth > 768 && sidebar) {
+        sidebar.classList.add('collapsed');
+    }
 }
 
 // 2. Input Elements Form Sync (Range <--> Number)
