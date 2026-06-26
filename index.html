@@ -91,14 +91,19 @@
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="brand-container">
-                <div class="brand-logo">
-                    <i class="fa-solid fa-shield-halved"></i>
+            <div class="brand-container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div class="brand-info" style="display: flex; align-items: center; gap: 16px;">
+                    <div class="brand-logo">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>LendOptima <span class="accent-text">AI</span></h1>
+                        <p>Approval Classifier</p>
+                    </div>
                 </div>
-                <div class="brand-text">
-                    <h1>LendOptima <span class="accent-text">AI</span></h1>
-                    <p>Approval Classifier</p>
-                </div>
+                <button class="btn btn-secondary btn-icon" id="btn-sidebar-close" style="display: none;" title="Close Sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
             
             <nav class="nav-menu">
@@ -140,9 +145,14 @@
         <main class="main-content">
             <!-- Top Header Bar -->
             <header class="top-bar">
-                <div class="page-title">
-                    <h2 id="current-tab-title">Overview Dashboard</h2>
-                    <p id="current-tab-subtitle">Real-time statistics & visual analytics of the loan approval dataset</p>
+                <div class="header-title-container" style="display: flex; align-items: center; gap: 16px;">
+                    <button class="btn btn-secondary btn-icon" id="btn-sidebar-open" style="display: none;" title="Open Sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h2 id="current-tab-title">Overview Dashboard</h2>
+                        <p id="current-tab-subtitle">Real-time statistics & visual analytics of the loan approval dataset</p>
+                    </div>
                 </div>
                 
                 <div class="header-actions">
@@ -809,5 +819,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 </body>
 </html>

@@ -23,6 +23,7 @@ const FALLBACK_STATS = {
 // Main Initialization
 document.addEventListener('DOMContentLoaded', () => {
     initTabNavigation();
+    initMobileNavigation();
     initFormSync();
     initCSVLoader();
     setupPredictionListeners();
@@ -72,6 +73,46 @@ function initTabNavigation() {
                 renderFeatureImportanceChart();
             }
         });
+    });
+}
+
+// 1.1 Mobile Navigation Handler
+function initMobileNavigation() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const openBtn = document.getElementById('btn-sidebar-open');
+    const closeBtn = document.getElementById('btn-sidebar-close');
+    const navItems = document.querySelectorAll('.nav-item');
+
+    function openSidebar() {
+        if (sidebar && overlay) {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        }
+    }
+
+    function closeSidebar() {
+        if (sidebar && overlay) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', openSidebar);
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close sidebar when a navigation item is clicked (on mobile)
+    navItems.forEach(item => {
+        item.addEventListener('click', closeSidebar);
     });
 }
 

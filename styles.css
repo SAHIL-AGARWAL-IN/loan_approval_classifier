@@ -1387,3 +1387,195 @@ body {
     border-radius: var(--radius-md);
 }
 
+/* Sidebar Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 13, 22, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    pointer-events: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Responsive & Mobile Layout Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    #btn-sidebar-close {
+        display: inline-flex !important;
+    }
+    
+    #btn-sidebar-open {
+        display: inline-flex !important;
+    }
+    
+    .top-bar {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+    
+    .top-bar > div:first-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    #current-tab-subtitle {
+        display: none; /* Hide long subtitle to fit header on mobile screens */
+    }
+    
+    .content-body {
+        padding: 20px 16px;
+    }
+    
+    .card-panel {
+        padding: 20px;
+    }
+    
+    .kpi-grid {
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .kpi-card {
+        padding: 16px;
+    }
+    
+    .charts-grid {
+        gap: 16px;
+    }
+    
+    .chart-card {
+        padding: 16px;
+    }
+    
+    .modal-box {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .top-bar {
+        padding: 12px 16px;
+    }
+    
+    .header-actions {
+        gap: 6px;
+    }
+    
+    .header-actions .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .header-actions .btn-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    #data-status-text {
+        display: none; /* Hide status text on small screens, only keep indicator dot */
+    }
+    
+    #data-status-badge {
+        padding: 6px 8px;
+    }
+    
+    .table-footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    /* Confusion Matrix Scale Down for Narrow Viewports */
+    .cm-grid {
+        grid-template-columns: 24px 64px 96px 96px;
+        grid-template-rows: auto 70px 70px;
+        gap: 4px;
+    }
+    
+    .cm-header {
+        font-size: 0.7rem;
+        padding: 4px;
+    }
+    
+    .cm-row-title {
+        font-size: 0.65rem;
+        padding-right: 6px;
+    }
+    
+    .cm-value {
+        font-size: 1.1rem;
+    }
+    
+    .cm-cell-label {
+        font-size: 0.55rem;
+    }
+    
+    .cm-axis-label {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .badge-card {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+    
+    .badge-icon {
+        font-size: 1.25rem;
+    }
+    
+    .badge-details h4 {
+        font-size: 0.85rem;
+    }
+    
+    .badge-details p {
+        font-size: 0.75rem;
+    }
+}
+
